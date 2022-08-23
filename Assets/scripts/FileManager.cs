@@ -9,9 +9,11 @@ public class FileManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log("test opening jar file");
-        var strCmdText= "/C notepad";   //This command to open a new notepad
-        System.Diagnostics.Process.Start("CMD.exe",strCmdText); //Start cmd process
+        var myProcess = new Process();
+        myProcess.StartInfo.UseShellExecute = false;
+        myProcess.StartInfo.FileName = "java";
+        myProcess.StartInfo.Arguments = "-jar C:\\programming\\konsole\\Konsole\\out\\artifacts\\Konsole_jar\\Konsole.jar";
+        myProcess.Start();
     }
 
     // Update is called once per frame
