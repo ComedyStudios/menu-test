@@ -12,6 +12,7 @@ namespace DefaultNamespace
         private Animator _animator;
         
         private bool isMoving;
+        private float inputValue;
         private static readonly int MovementInput = Animator.StringToHash("movementInput");
 
         private void OnEnable()
@@ -35,20 +36,24 @@ namespace DefaultNamespace
 
         private void Update()
         {
-            if (!isMoving)
+            inputValue = _input.UiNavigation1.move.ReadValue<Vector2>().x;
+            Debug.Log(inputValue);
+            if (!isMoving && inputValue != 0 && _selectedGame + inputValue >=  0 && _selectedGame+inputValue<transform.childCount-1 )
             {
                 StartCoroutine(moveGames());
-                
             }
         }
 
         IEnumerator moveGames()
-        {
-            Debug.Log(_selectedGame);
-            isMoving = true;
+        { 
+            isMoving = true;    
             switchCardState();
-            int value = -Mathf.RoundToInt(_input.UiNavigation1.move.ReadValue<Vector2>().x);
-            transform.parent.localPosition += new Vector3(140 * value, 0,0);
+            int value = -Mathf.RoundToInt(inputValue);
+            for (int i = 0; i<35; i++)
+            {
+                transform.parent.localPosition += new Vector3(4 * value, 0,0);
+                yield return new WaitForSeconds(0.0001f);
+            }
             _selectedGame -= value;
             switchCardState();
             yield return new WaitForSeconds(0.25f);
