@@ -1670,6 +1670,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 856521453}
     m_Modifications:
+    - target: {fileID: 1739702886523478744, guid: 707fd08cd8e3f514e82fcc583560e5f8, type: 3}
+      propertyPath: path
+      value: /execs/pong
+      objectReference: {fileID: 0}
+    - target: {fileID: 1739702886523478744, guid: 707fd08cd8e3f514e82fcc583560e5f8, type: 3}
+      propertyPath: execName
+      value: Pong.jar
+      objectReference: {fileID: 0}
     - target: {fileID: 1739702886523478748, guid: 707fd08cd8e3f514e82fcc583560e5f8, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1778,7 +1786,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1739702886523478744, guid: 707fd08cd8e3f514e82fcc583560e5f8, type: 3}
       propertyPath: path
-      value: C:\\programming\\unity\\menu\\menu\\execs\\rollDice
+      value: /execs/rollDice
       objectReference: {fileID: 0}
     - target: {fileID: 1739702886523478744, guid: 707fd08cd8e3f514e82fcc583560e5f8, type: 3}
       propertyPath: execName
