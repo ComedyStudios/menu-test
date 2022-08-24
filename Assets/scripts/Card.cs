@@ -1,26 +1,65 @@
 ﻿using System;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
-namespace DefaultNamespace
+public enum CardType
 {
-    public class Card: MonoBehaviour
-    {
-        [SerializeField] private string path;
-        [SerializeField] private string execName;
+    GameLauncher,
+    ShutdownButton,
+}
+
+public class Card: MonoBehaviour
+{
+    [SerializeField] private CardType type;
+    [SerializeField] private string path;
+    [SerializeField] private string execName;
         
-        public bool isSelected = false;
+    public bool isSelected = false;
 
-        private Animator _animator;
-        private static readonly int IsSelected = Animator.StringToHash("isSelected");
+    private Animator _animator;
+    private static readonly int IsSelected = Animator.StringToHash("isSelected");
 
-        private void Start()
+    private void Start()
+    {
+        _animator = GetComponent<Animator>();
+    }
+
+    private void Update()
+    {
+        _animator.SetBool(IsSelected, isSelected);
+    }
+        
+    public void LaunchGame()
+    {
+        if (type == CardType.GameLauncher)
         {
-            _animator = GetComponent<Animator>();
+            if (execName.Length >= 3 )
+            {
+                var FileType = execName.Substring(execName.Length-3, 3);
+                UnityEngine.Debug.Log(FileType);
+
+                if (FileType == "jar")
+                {
+                    var myProcess = new Process();
+                    myProcess.StartInfo.UseShellExecute = false;
+                    myProcess.StartInfo.FileName = "java";
+                    myProcess.StartInfo.Arguments = $"-jar {path}\\{execName}";
+                    myProcess.Start();
+                }
+                else if (FileType == "exe")
+                {
+                    var myProcess = new Process();
+                    myProcess.StartInfo.UseShellExecute = false;
+                    myProcess.StartInfo.FileName = $"{path}\\{execName}";
+                    myProcess.Start();
+                }
+            }
         }
-
-        private void Update()
+        else if (type == CardType.ShutdownButton)
         {
-            _animator.SetBool(IsSelected, isSelected);
+            UnityEngine.Debug.Log("the console is shutting down");
+            Application.Quit(0);
         }
     }
 }

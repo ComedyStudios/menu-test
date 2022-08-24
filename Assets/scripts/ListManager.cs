@@ -2,75 +2,80 @@
 using System.Collections;
 using UnityEngine;
 
-namespace DefaultNamespace
+public class ListManager : MonoBehaviour
 {
-    public class ListManager : MonoBehaviour
+    private UserInput _input;
+    private int _selectedGame;
+    private RectTransform _rectTransform;
+    private Animator _animator;
+        
+    private bool isMoving;
+    private float inputValue;
+    private static readonly int MovementInput = Animator.StringToHash("movementInput");
+
+    private void OnEnable()
     {
-        private UserInput _input;
-        private int _selectedGame;
-        private RectTransform _rectTransform;
-        private Animator _animator;
-        
-        private bool isMoving;
-        private float inputValue;
-        private static readonly int MovementInput = Animator.StringToHash("movementInput");
+        _input = new UserInput();
+        _input.UiNavigation1.Enable();
+        _input.UiNavigation1.Press.performed += _ => StartGame();
+    }
 
-        private void OnEnable()
+    private void OnDisable()
+    {
+        _input.UiNavigation1.Disable();
+    }
+
+    private void Start()
+    {
+        _selectedGame = 1;
+        switchCardState();
+        _rectTransform = GetComponent<RectTransform>();
+        _animator = GetComponent<Animator>();
+    }
+
+    private void StartGame()
+    {
+        var childTransform = transform.GetChild(_selectedGame);
+        if ( childTransform.TryGetComponent(out Card cardScript))
         {
-            _input = new UserInput();
-            _input.UiNavigation1.Enable();
+            cardScript.LaunchGame();
         }
-
-        private void OnDisable()
+    }
+    private void Update()
+    {
+        inputValue = _input.UiNavigation1.move.ReadValue<Vector2>().x;
+        if (!isMoving && inputValue != 0 && _selectedGame + inputValue >=  0 && _selectedGame+inputValue<transform.childCount)
         {
-            _input.UiNavigation1.Disable();
+            StartCoroutine(moveGames());
         }
+    }
 
-        private void Start()
+    IEnumerator moveGames()
+    { 
+        isMoving = true;    
+        switchCardState();
+        int value = -Mathf.RoundToInt(inputValue);
+        for (int i = 0; i<35; i++)
         {
-            _selectedGame = 1;
-            switchCardState();
-            _rectTransform = GetComponent<RectTransform>();
-            _animator = GetComponent<Animator>();
+            transform.parent.localPosition += new Vector3(4 * value, 0,0);
+            yield return new WaitForSeconds(0.0001f);
         }
-
-        private void Update()
-        {
-            inputValue = _input.UiNavigation1.move.ReadValue<Vector2>().x;
-            Debug.Log(inputValue);
-            if (!isMoving && inputValue != 0 && _selectedGame + inputValue >=  0 && _selectedGame+inputValue<transform.childCount-1 )
-            {
-                StartCoroutine(moveGames());
-            }
-        }
-
-        IEnumerator moveGames()
-        { 
-            isMoving = true;    
-            switchCardState();
-            int value = -Mathf.RoundToInt(inputValue);
-            for (int i = 0; i<35; i++)
-            {
-                transform.parent.localPosition += new Vector3(4 * value, 0,0);
-                yield return new WaitForSeconds(0.0001f);
-            }
-            _selectedGame -= value;
-            switchCardState();
-            yield return new WaitForSeconds(0.25f);
-            isMoving = false;
-        }
+        _selectedGame -= value;
+        switchCardState();
+        yield return new WaitForSeconds(0.25f);
+        isMoving = false;
+    }
         
 
-        private void switchCardState()
-        {
-            var child = transform.GetChild(_selectedGame);
-            var cardScript = child.GetComponent<Card>();
-            cardScript.isSelected = cardScript.isSelected != true;
-        }
+    private void switchCardState()
+    {
+        var child = transform.GetChild(_selectedGame);
+        var cardScript = child.GetComponent<Card>();
+        cardScript.isSelected = cardScript.isSelected != true;
+    }
 
-        bool AnimatorIsPlaying(){
-            return _animator.GetCurrentAnimatorStateInfo(0).length >
-                   _animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-        }
+    bool AnimatorIsPlaying(){
+        return _animator.GetCurrentAnimatorStateInfo(0).length >
+               _animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
     }
 }

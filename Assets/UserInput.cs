@@ -35,6 +35,15 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Press"",
+                    ""type"": ""Button"",
+                    ""id"": ""d668d3f7-bc1d-43af-8bd4-fef2f744b8ea"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -92,6 +101,17 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                     ""action"": ""move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""191d9b76-4ef0-4c88-9d89-161b470eb5f0"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Press"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -101,6 +121,7 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
         // UiNavigation1
         m_UiNavigation1 = asset.FindActionMap("UiNavigation1", throwIfNotFound: true);
         m_UiNavigation1_move = m_UiNavigation1.FindAction("move", throwIfNotFound: true);
+        m_UiNavigation1_Press = m_UiNavigation1.FindAction("Press", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -161,11 +182,13 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_UiNavigation1;
     private IUiNavigation1Actions m_UiNavigation1ActionsCallbackInterface;
     private readonly InputAction m_UiNavigation1_move;
+    private readonly InputAction m_UiNavigation1_Press;
     public struct UiNavigation1Actions
     {
         private @UserInput m_Wrapper;
         public UiNavigation1Actions(@UserInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @move => m_Wrapper.m_UiNavigation1_move;
+        public InputAction @Press => m_Wrapper.m_UiNavigation1_Press;
         public InputActionMap Get() { return m_Wrapper.m_UiNavigation1; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -178,6 +201,9 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                 @move.started -= m_Wrapper.m_UiNavigation1ActionsCallbackInterface.OnMove;
                 @move.performed -= m_Wrapper.m_UiNavigation1ActionsCallbackInterface.OnMove;
                 @move.canceled -= m_Wrapper.m_UiNavigation1ActionsCallbackInterface.OnMove;
+                @Press.started -= m_Wrapper.m_UiNavigation1ActionsCallbackInterface.OnPress;
+                @Press.performed -= m_Wrapper.m_UiNavigation1ActionsCallbackInterface.OnPress;
+                @Press.canceled -= m_Wrapper.m_UiNavigation1ActionsCallbackInterface.OnPress;
             }
             m_Wrapper.m_UiNavigation1ActionsCallbackInterface = instance;
             if (instance != null)
@@ -185,6 +211,9 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
                 @move.started += instance.OnMove;
                 @move.performed += instance.OnMove;
                 @move.canceled += instance.OnMove;
+                @Press.started += instance.OnPress;
+                @Press.performed += instance.OnPress;
+                @Press.canceled += instance.OnPress;
             }
         }
     }
@@ -192,5 +221,6 @@ public partial class @UserInput : IInputActionCollection2, IDisposable
     public interface IUiNavigation1Actions
     {
         void OnMove(InputAction.CallbackContext context);
+        void OnPress(InputAction.CallbackContext context);
     }
 }
