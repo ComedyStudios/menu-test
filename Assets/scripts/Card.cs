@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
 
 public enum CardType
 {
