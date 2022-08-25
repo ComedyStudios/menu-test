@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Ports;
 using UnityEngine;
 using Debug = System.Diagnostics.Debug;
 
@@ -38,14 +39,12 @@ public class Card: MonoBehaviour
             if (execName.Length >= 3 )
             {
                 var FileType = execName.Substring(execName.Length-3, 3);
-                UnityEngine.Debug.Log(FileType);
-
                 if (FileType == "jar")
                 {
                     var myProcess = new Process();
                     myProcess.StartInfo.UseShellExecute = false;
                     myProcess.StartInfo.FileName = "java";
-                    myProcess.StartInfo.Arguments = $"-jar {Directory.GetCurrentDirectory()}{path}/{execName}";
+                    myProcess.StartInfo.Arguments = $"-jar {Directory.GetCurrentDirectory()}\\{path}\\{execName}";
                     myProcess.Start();
                 }
                 else if (FileType == "exe")

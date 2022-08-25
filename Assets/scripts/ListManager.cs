@@ -41,6 +41,7 @@ public class ListManager : MonoBehaviour
         if ( childTransform.TryGetComponent(out Card cardScript))
         {
             cardScript.LaunchGame();
+            arduino.ClosePort();
         }
     }
     private void Update()

@@ -139,6 +139,7 @@ public class Pong {
             else x = -x;
 
         }
+        if (controller.getL()) reset();
         soundManager.play();
         ball.move(x, y);
 

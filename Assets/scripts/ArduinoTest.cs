@@ -6,18 +6,20 @@ using UnityEngine;
 public class ArduinoTest : MonoBehaviour
 {
     public ControllerInfo inputs = new ControllerInfo();
-
     private List<int> _dataList = new List<int>();
     private SerialPort _port;
 
     void Start()
     {
         //TODO: ckeck if any port is working
+        OpenPort();
+    }
+
+    private void OpenPort()
+    {
         var ports = SerialPort.GetPortNames();
-        Debug.Log(ports[^1]);
         _port = new SerialPort(ports[^1], 9600);
         _port.Open();
-
     }
 
     // Update is called once per frame
@@ -77,6 +79,12 @@ public class ArduinoTest : MonoBehaviour
             return 0;
         }
     }
+
+    public void ClosePort()
+    {
+        _port.Close();
+    }
+    
 }
 
 public class ControllerInfo
