@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ListManager : MonoBehaviour
 {
+    [SerializeField]private ArduinoTest arduino;
+    
     private UserInput _input;
     private int _selectedGame;
-    private RectTransform _rectTransform;
     private Animator _animator;
-        
     private bool isMoving;
     private float inputValue;
     private static readonly int MovementInput = Animator.StringToHash("movementInput");
+    private bool _buttonHasBeenPressed;
+    
 
     private void OnEnable()
     {
@@ -29,7 +32,6 @@ public class ListManager : MonoBehaviour
     {
         _selectedGame = 1;
         switchCardState();
-        _rectTransform = GetComponent<RectTransform>();
         _animator = GetComponent<Animator>();
     }
 
@@ -43,7 +45,27 @@ public class ListManager : MonoBehaviour
     }
     private void Update()
     {
-        inputValue = _input.UiNavigation1.move.ReadValue<Vector2>().x;
+        if (arduino.inputs.r && !_buttonHasBeenPressed)
+        {
+            _buttonHasBeenPressed = true;
+            StartGame();
+        }
+
+        if (!arduino.inputs.r && _buttonHasBeenPressed)
+        {
+            _buttonHasBeenPressed = false;
+        }
+        
+        var unityInput = _input.UiNavigation1.move.ReadValue<Vector2>().x;
+        var arduinoInput = arduino.inputs.stickR.x;
+        if (Math.Abs(arduinoInput) > Math.Abs(unityInput))
+        {
+            inputValue = arduinoInput;
+        }
+        else
+        {
+            inputValue = unityInput;
+        }
         if (!isMoving && inputValue != 0 && _selectedGame + inputValue >=  0 && _selectedGame+inputValue<transform.childCount)
         {
             StartCoroutine(moveGames());
@@ -58,7 +80,7 @@ public class ListManager : MonoBehaviour
         for (int i = 0; i<35; i++)
         {
             transform.parent.localPosition += new Vector3(4 * value, 0,0);
-            yield return new WaitForSeconds(0.0001f);
+            yield return new WaitForSeconds(0.000001f);
         }
         _selectedGame -= value;
         switchCardState();

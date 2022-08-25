@@ -1,0 +1,232 @@
+import sas.*;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.awt.*;
+import java.io.IOException;
+
+public class Pong {
+
+    View view;
+    sas.Rectangle background;
+    sas.Rectangle playerL;
+    sas.Rectangle playerR;
+    sas.Circle ball;
+    Controller controller;
+
+    Text startscreen;
+    Text pongSchriftzug;
+    Text scoreLLbl;
+    Text scoreRLbl;
+    Text endSchriftzug;
+    Text replay;
+    Text replay2;
+    SoundManager soundManager;
+
+    boolean gameover = false;
+    boolean collision = false;
+    boolean quit = false;
+
+    int x = 1;
+    int y = -2;
+    int scoreL = 0;
+    int scoreR = 0;
+    int maxScore = 3;
+
+    public Pong() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+
+        controller = new Controller();
+        soundManager = new SoundManager();
+        view = new View(600, 600);
+        background = new sas.Rectangle(0, 0, 600, 600, new Color(0, 0, 0));
+        playerL = new sas.Rectangle(20, 275, 10, 50, new Color(255, 255, 255));
+        playerL.setHidden(true);
+        playerR = new sas.Rectangle(570, 275, 10, 50, new Color(255, 255, 255));
+        playerR.setHidden(true);
+        ball = new sas.Circle(295, 295, 5, new Color(255, 255, 255));
+        ball.setHidden(true);
+        startscreen = new Text(254, 286, "Press + to start", new Color(255, 255, 255));
+        pongSchriftzug = new Text(280, 100, "PONG", new Color(255, 255, 255));
+        pongSchriftzug.scaleTo(300, 150);
+        scoreLLbl = new Text(200, 20, "0", new Color(255, 255, 255));
+        scoreLLbl.scaleTo(50, 100);
+        scoreLLbl.setHidden(true);
+        scoreRLbl = new Text(400, 20, "0", new Color(255, 255, 255));
+        scoreRLbl.scaleTo(50, 100);
+        scoreRLbl.setHidden(true);
+        endSchriftzug = new Text(250, 200, "Player R wins", new Color(255, 255, 255));
+        endSchriftzug.scaleTo(200, 50);
+        endSchriftzug.setHidden(true);
+        replay = new Text(235, 286, "Press + to replay", new Color(255, 255 ,255));
+        replay.setHidden(true);
+        replay2 = new Text(240, 306, "Press - to Quit", new Color(255, 255 ,255));
+        replay2.setHidden(true);
+
+        play();
+
+    }
+
+    public void play() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+
+        while (!controller.getR()) {
+
+            view.wait(1);
+
+        }
+        while (!quit) {
+
+            startgame();
+            while (!gameover) {
+
+                while (!collision) {
+
+                    if (!((playerL.getCenterY() + 25) >= 600 || (playerL.getCenterY() - 25) <= 0))
+                        playerL.move(0, 2 * controller.getY1());
+                    else if ((playerL.getCenterY() + 25) >= 600) playerL.move(0, -2);
+                    else playerL.move(0, 2);
+                    if (!((playerR.getCenterY() + 25) >= 600 || (playerR.getCenterY() - 25) <= 0))
+                        playerR.move(0, 2 * controller.getY2());
+                    else if ((playerR.getCenterY() + 25) >= 600) playerR.move(0, -2);
+                    else playerR.move(0, 2);
+                    ball.move(x, y);
+                    collisionRefresh();
+                    view.wait(5);
+
+                }
+                if (bounceable()) bounce();
+                else {
+
+                    if (over()) gameover = true;
+                    if (!(scoreL == maxScore || scoreR == maxScore)) {
+
+                        gameover = false;
+                        reset();
+
+                    }
+                    scoreLLbl.setText(Integer.toString(scoreL));
+                    scoreRLbl.setText(Integer.toString(scoreR));
+
+                }
+                collisionRefresh();
+
+            }
+            endgame();
+
+        }
+        endall();
+
+    }
+
+    public void collisionRefresh() {
+
+        collision = ball.intersects(playerL) || ball.intersects(playerR) || ball.getCenterX() + 5 >= 600 ||
+                ball.getCenterX() - 5 <= 0 || ball.getCenterY() + 5 >= 600 || ball.getCenterY() - 5 <= 0;
+
+
+    }
+
+    public boolean bounceable() {
+
+        return (ball.getCenterY() + 5 >= 600 || ball.getCenterY() - 5 <= 0 || ball.intersects(playerL) || ball.intersects(playerR));
+
+    }
+
+    public void bounce() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+
+        if (ball.getCenterY() + 5 >= 600 || ball.getCenterY() - 5 <= 0) y = -y;
+        if (ball.intersects(playerL) || ball.intersects(playerR)) {
+
+            if (ballGegenKante(playerL) || ballGegenKante(playerR)) y = -y;
+            else x = -x;
+
+        }
+        soundManager.play();
+        ball.move(x, y);
+
+    }
+
+    public boolean ballGegenKante(sas.Rectangle player) {
+
+        return ((ball.getCenterX() >= (player.getCenterX() - 5)) && (ball.getCenterX() <= (player.getCenterX() + 5)) &&
+                (ball.getCenterY() + 5 >= player.getCenterY() - 25) && (ball.getCenterY() + 5 <= player.getCenterY() - 20) ||
+                (ball.getCenterY() - 5 <= player.getCenterY() + 25) && (ball.getCenterY() - 5 >= player.getCenterY() + 20));
+
+    }
+
+    public boolean over() {
+
+        if (ball.getCenterX() - 5 <= 0) scoreR++;
+        if (ball.getCenterX() + 5 >= 600) scoreL++;
+        return (ball.getCenterX() + 5 >= 600 || ball.getCenterX() - 5 <= 0);
+
+    }
+
+    public void startgame() {
+
+        playerL.setHidden(false);
+        playerR.setHidden(false);
+        ball.setHidden(false);
+        scoreLLbl.setHidden(false);
+        scoreRLbl.setHidden(false);
+        startscreen.setHidden(true);
+        pongSchriftzug.setHidden(true);
+        replay.setHidden(true);
+        replay2.setHidden(true);
+        endSchriftzug.setHidden(true);
+
+    }
+
+    public void endgame() {
+
+        reset();
+        playerL.setHidden(true);
+        playerR.setHidden(true);
+        ball.setHidden(true);
+        endSchriftzug.setHidden(false);
+        replay.setHidden(false);
+        replay2.setHidden(false);
+        y = -2;
+        x = 1;
+        if (scoreR == maxScore) endSchriftzug.setText("Player R wins!!!");
+        if (scoreL == maxScore) endSchriftzug.setText("Player L wins!!!");
+        while (!(controller.getR() || controller.getL())) {
+
+            view.wait(1);
+
+        }
+        if (controller.getR()) {
+
+            quit = false;
+            gameover = false;
+            scoreL = 0;
+            scoreR = 0;
+            scoreLLbl.setText(Integer.toString(scoreL));
+            scoreRLbl.setText(Integer.toString(scoreR));
+
+        }
+        if (controller.getL()) quit = true;
+    }
+
+    public void reset() {
+
+        playerL.moveTo(20, 275);
+        playerR.moveTo(570, 275);
+        ball.moveTo(295, 295);
+        x = -x;
+        y = -y;
+        collision = false;
+
+    }
+
+    public void endall() throws IOException {
+
+        Process p = Runtime.getRuntime().exec("taskkill /im java.exe");
+
+    }
+
+    public static void main(String[] arguments) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+
+        Pong pong = new Pong();
+
+    }
+
+}

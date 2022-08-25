@@ -1,0 +1,26 @@
+import java.io.File;
+import java.io.IOException;
+import javax.sound.sampled.*;
+
+public class SoundManager{
+    Clip clip;
+    AudioInputStream audioStream;
+    static String audioPath;
+
+    public SoundManager() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+
+        audioPath = "./pongbounce.wav";
+        audioStream = AudioSystem.getAudioInputStream(new File(audioPath).getAbsoluteFile());
+        clip = AudioSystem.getClip();
+        clip.open(audioStream);
+
+    }
+
+    public void play() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+
+        clip.setMicrosecondPosition(0);
+        clip.start();
+
+    }
+
+}
