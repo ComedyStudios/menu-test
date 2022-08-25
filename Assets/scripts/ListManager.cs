@@ -42,6 +42,25 @@ public class ListManager : MonoBehaviour
         {
             cardScript.LaunchGame();
             arduino.ClosePort();
+            StartCoroutine(TryToReconect());
+        }
+    }
+    
+    IEnumerator TryToReconect()
+    {
+        for (int i = 0; i<100000; i++)
+        {
+            Debug.Log("trying to Reconect");
+            yield return new WaitForSeconds(1);
+            try
+            {
+                arduino.OpenPort();
+                break;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
     }
     private void Update()

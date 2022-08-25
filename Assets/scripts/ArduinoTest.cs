@@ -15,11 +15,11 @@ public class ArduinoTest : MonoBehaviour
         OpenPort();
     }
 
-    private void OpenPort()
+    public void OpenPort()
     {
         var ports = SerialPort.GetPortNames();
         _port = new SerialPort(ports[^1], 9600);
-        _port.Open();
+        _port.Open();   
     }
 
     // Update is called once per frame
